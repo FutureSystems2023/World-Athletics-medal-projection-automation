@@ -10,7 +10,8 @@ library(optparse)
 conflicts_prefer(dplyr::filter)
 
 option_list = list(
-  make_option(c("-f", "--file"), type = "character", default = NULL, help = "target excel file name", metavar = "character")
+  make_option(c("-f", "--file"), type = "character", default = NULL, help = "target excel file name", metavar = "character"),
+  make_option(c("-c", "--compileOutput"), action = "store_true", default = NULL, help = "Compile output into Completed folder with its respective subfolder")
 );
 
 opt_parser = OptionParser(option_list = option_list);
@@ -23,6 +24,7 @@ if (is.null(opt$file)) {
     print(paste("No target file name specified.", targetFile, "will be used as target excel file..."))
   }, error = function(err) {
     print(err)
+    quit()
   })
 } else {
   targetFile = opt$file
@@ -30,9 +32,11 @@ if (is.null(opt$file)) {
 
 # Read Excel from filepath and assign to dataframe object variables
 filePath <- targetFile
+print(paste("Target Excel file is:", filePath))
 athlete_data_2019to2023 <- read_excel(filePath, sheet = "Competitors 2019-2023")
 athlete_data_2022to2023 <- read_excel(filePath, sheet = "Competitors 2022-2023")
 athlete_data_2023 <- read_excel(filePath, sheet = "Competitors 2023")
+print("Commencing automated normality tests on data...")
 
 
 # Create 2 Empty DataFrames, 1 with columns (Shapiro Wilk test) and 1 for compiling the different datasets used
@@ -84,11 +88,12 @@ for (i in 1:length(UniqueAthletes)) {
   shap_test = shapiro.test(Athlete$mark)
 
   # Conditional Checks for Shapiro Wilk Normality test of Dataframe Object. If less than 0.05, escalate to next dataset.
-  if (shap_test$p.value < 0.05) {
+  if (shap_test$p.value < 0.05 && dataset_used != "2019-2023") {
     dataset_used <- "2022-2023"
     remarks <- paste("Shapiro Wilk not normal for 2023 (p-value = ", shap_test$p.value, ")")
     # print("Shapiro-wilk test lesser than 0.05, trying 2022 to 2023 dataset")
-    top50pctResultsRows <- ceiling(nrow(Athlete) / 2)
+    results <- filter(athlete_data_2022to2023, full_name_computed == UniqueSwimmers[i])
+    top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     shap_test = shapiro.test(Athlete$mark)
@@ -99,7 +104,8 @@ for (i in 1:length(UniqueAthletes)) {
     dataset_used <- "2019-2023"
     remarks <- paste("Shapiro Wilk not normal for 2022-2023 (p-value = ", shap_test$p.value, ")")
     # print("Shapiro-wilk test lesser than 0.05, trying 2019 to 2023 dataset")
-    top50pctResultsRows <- ceiling(nrow(Athlete) / 2)
+    results <- filter(athlete_data_2019to2023, full_name_computed == UniqueSwimmers[i])
+    top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     shap_test = shapiro.test(Athlete$mark)
@@ -122,3 +128,30 @@ for (i in 1:length(UniqueAthletes)) {
 # Write out analysis to csvs (one for shaprio test results, one for the dataset used)
 write.csv(df_shapiroTestResults, "shapiroTest.csv", row.names = FALSE)
 write.csv(df_results, "dataset.csv", row.names = FALSE)
+
+
+# Move Files function
+my.file.rename <- function(from, to) {
+  todir <- dirname(to)
+  if (!isTRUE(file.info(todir)$isdir)) dir.create(todir, recursive = TRUE)
+  file.rename(from = from, to = to)
+}
+
+
+# Move Files to Completed and create subfolder based on target excel file name
+if (!is.null(opt$compileOutput)) {
+  print(paste("Moving Files to './Completed/", substr(filePath, 1, nchar(filePath) - 5), "'...", sep = ""))
+  if (!file.exists("./Completed")) {
+    dir.create("./Completed")
+  }
+  file.copy(from = "./shapiroTest.csv", to = paste("./Completed/", substr(filePath, 1, nchar(filePath) - 5), " shapiroTest.csv", sep = ""))
+  my.file.rename(from = "./shapiroTest.csv",
+               to = paste("./Completed/", substr(filePath, 1, nchar(filePath) - 5), "/shapiroTest.csv", sep = ""))
+  my.file.rename(from = "./dataset.csv",
+               to = paste("./Completed/", substr(filePath, 1, nchar(filePath) - 5), "/dataset.csv", sep = ""))
+  my.file.rename(from = filePath,
+               to = paste("./Completed/", substr(filePath, 1, nchar(filePath) - 5), "/", filePath, sep = ""))
+}
+
+
+print("R script ran successfully!")
