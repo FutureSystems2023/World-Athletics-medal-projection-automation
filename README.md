@@ -15,7 +15,18 @@ Open up R console. Change into current directory and run R install.packages() to
 
 Ensure that R is installed and added to environment path before proceeding. In your terminal or your preferred CLI, Change into directory of normality_test.R script and run the following command.
 
+<pre><code>Rscript normality_test.R -f INPUT_TARGET_EXCEL_FILE_NAME_HERE</code></pre>
+
+If target excel file name is not specified, the <u>first excel file (.xlsx)</u> that script can find will be used. Hence if there is only one excel file in the directory, this following command with no argument will be sufficient:
+
 <pre><code>Rscript normality_test.R</code></pre>
+
+### **Help on Script**
+
+Run the following command to see help and arguments for the script.
+
+<pre><code>Rscript normality_test.R -h</code></pre>
+
 <hr>
 
 ## **What does the Script do?**

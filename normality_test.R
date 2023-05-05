@@ -5,12 +5,31 @@ library(ggplot2)
 library(readxl)
 library(chron)
 library(lubridate)
+library(optparse)
 
 conflicts_prefer(dplyr::filter)
 
+option_list = list(
+  make_option(c("-f", "--file"), type = "character", default = NULL, help = "target excel file name", metavar = "character")
+);
 
-# Read Excel from filepath and assign to dataframe object variable
-filePath <- "finalFilteredCleanedResults.xlsx"
+opt_parser = OptionParser(option_list = option_list);
+opt = parse_args(opt_parser);
+
+# Check if target excel file name was supplied, if not use wildcard excel file.
+if (is.null(opt$file)) {
+  tryCatch({
+    targetFile = list.files(pattern = "\\.xlsx$")[1]
+    print(paste("No target file name specified.", targetFile, "will be used as target excel file..."))
+  }, error = function(err) {
+    print(err)
+  })
+} else {
+  targetFile = opt$file
+}
+
+# Read Excel from filepath and assign to dataframe object variables
+filePath <- targetFile
 athlete_data_2019to2023 <- read_excel(filePath, sheet = "Competitors 2019-2023")
 athlete_data_2022to2023 <- read_excel(filePath, sheet = "Competitors 2022-2023")
 athlete_data_2023 <- read_excel(filePath, sheet = "Competitors 2023")
