@@ -31,7 +31,7 @@ Run the following command to see help and arguments for the script.
 
 ## **What does the Script do?**
 
-The script retrieves the data from the different worksheets (Competitors 2019-2023, Competitors 2022-2023 & Competitors 2023) in finalFilteredCleanedResults.xlsx created by scrapping <a href="https://github.com/FSonline23/World-Athletics-data-collection/blob/main/script.py">python script</a>.
+The script retrieves the data from the different worksheets (Competitors 2019-2023, Competitors 2022-2023 & Competitors 2023) in an excecl file (.xlsx) created by scrapping <a href="https://github.com/FSonline23/World-Athletics-data-collection/blob/main/script.py">python script</a>. This target excel file can be defined by the user. If not specified, script will use the first excel file it encounters in the directory.
 
 Using dplyr library, shapiro wilk test will be conducted on the each unique athletes from the data. 2 CSVs will be outputed after running of script. One of the CSVs contains the results of the statistical test while the other contains the particular dataset (by year) that was used to test for the athletes. The reason for the dataset used will be explained in the [remarks] column.
 

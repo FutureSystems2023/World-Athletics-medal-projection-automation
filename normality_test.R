@@ -78,7 +78,6 @@ for (i in 1:length(UniqueAthletes)) {
 
     # Append Athlete normality result to dataframe
     df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
-    # print(paste("Final Shapiro wilk p-value: NA. Dataset Used:", dataset_used))
 
     # Append Athlete dataset to dataframe
     df_results = rbind(df_results, Athlete)
@@ -91,25 +90,21 @@ for (i in 1:length(UniqueAthletes)) {
   if (shap_test$p.value < 0.05 && dataset_used != "2019-2023") {
     dataset_used <- "2022-2023"
     remarks <- paste("Shapiro Wilk not normal for 2023 (p-value = ", shap_test$p.value, ")")
-    # print("Shapiro-wilk test lesser than 0.05, trying 2022 to 2023 dataset")
-    results <- filter(athlete_data_2022to2023, full_name_computed == UniqueSwimmers[i])
+    results <- filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i])
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     shap_test = shapiro.test(Athlete$mark)
-    # print(shap_test$p.value)
   }
 
   if (shap_test$p.value < 0.05) {
     dataset_used <- "2019-2023"
     remarks <- paste("Shapiro Wilk not normal for 2022-2023 (p-value = ", shap_test$p.value, ")")
-    # print("Shapiro-wilk test lesser than 0.05, trying 2019 to 2023 dataset")
-    results <- filter(athlete_data_2019to2023, full_name_computed == UniqueSwimmers[i])
+    results <- filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i])
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     shap_test = shapiro.test(Athlete$mark)
-    # print(shap_test$p.value)
   }
 
   if (shap_test$p.value < 0.05) {
