@@ -84,7 +84,14 @@ for (i in 1:length(UniqueAthletes)) {
     next
   }
 
-  shap_test = shapiro.test(Athlete$mark)
+  if (sum(!duplicated(Athlete$mark)) == 1) {
+    remarks <- paste("Athlete has same data for all available datapoints, please manually run normality test. (total of ", nrow(Athlete), " datapts)")
+    df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
+    df_results = rbind(df_results, Athlete)
+    next
+  } else {
+    shap_test = shapiro.test(Athlete$mark)
+  }
 
   # Conditional Checks for Shapiro Wilk Normality test of Dataframe Object. If less than 0.05, escalate to next dataset.
   if (shap_test$p.value < 0.05 && dataset_used != "2019-2023") {
@@ -94,7 +101,14 @@ for (i in 1:length(UniqueAthletes)) {
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
-    shap_test = shapiro.test(Athlete$mark)
+    if (sum(!duplicated(Athlete$mark)) == 1) {
+      remarks <- paste("Athlete has same data for all available datapoints, please manually run normality test. (total of ", nrow(Athlete), " datapts)")
+      df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
+      df_results = rbind(df_results, Athlete)
+      next
+    } else {
+      shap_test = shapiro.test(Athlete$mark)
+    }
   }
 
   if (shap_test$p.value < 0.05) {
@@ -104,7 +118,14 @@ for (i in 1:length(UniqueAthletes)) {
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
     Athlete$mark <- period_to_seconds(ms(Athlete$mark))
-    shap_test = shapiro.test(Athlete$mark)
+    if (sum(!duplicated(Athlete$mark)) == 1) {
+      remarks <- paste("Athlete has same data for all available datapoints, please manually run normality test. (total of ", nrow(Athlete), " datapts)")
+      df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
+      df_results = rbind(df_results, Athlete)
+      next
+    } else {
+      shap_test = shapiro.test(Athlete$mark)
+    }
   }
 
   if (shap_test$p.value < 0.05) {
