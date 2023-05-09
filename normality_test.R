@@ -100,7 +100,7 @@ for (i in 1:length(UniqueAthletes)) {
     results <- filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i])
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2022to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
-    Athlete$mark <- period_to_seconds(ms(Athlete$mark))
+    #Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     if (sum(!duplicated(Athlete$mark)) == 1) {
       remarks <- paste("Athlete has same data for all available datapoints, please manually run normality test. (total of ", nrow(Athlete), " datapts)")
       df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
@@ -117,7 +117,7 @@ for (i in 1:length(UniqueAthletes)) {
     results <- filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i])
     top50pctResultsRows <- ceiling(nrow(results) / 2)
     Athlete <- head(filter(athlete_data_2019to2023, athlete_name == UniqueAthletes[i]), top50pctResultsRows)
-    Athlete$mark <- period_to_seconds(ms(Athlete$mark))
+    #Athlete$mark <- period_to_seconds(ms(Athlete$mark))
     if (sum(!duplicated(Athlete$mark)) == 1) {
       remarks <- paste("Athlete has same data for all available datapoints, please manually run normality test. (total of ", nrow(Athlete), " datapts)")
       df_shapiroTestResults[nrow(df_shapiroTestResults) + 1,] = c(UniqueAthletes[i], "NA", dataset_used, nrow(results), top50pctResultsRows, remarks)
